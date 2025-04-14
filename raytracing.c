@@ -4,9 +4,10 @@
 
 #define WIDTH 1200
 #define HEIGHT 900
-#define COLOR 0xffffffff
+#define COLOR 0xf5511eff
+#define RAY 0xddddfdfd
 #define BLACK 0x00000000
-#define NUM 100
+#define NUM 800
 
 struct Circle {
     double x;
@@ -66,9 +67,9 @@ void FillRays(SDL_Surface* surface, struct Ray rays[NUM],Uint32 color, struct Ci
 	    if(x_draw<0||x_draw>WIDTH)
 		eos=1;
 	    if(y_draw<0|| y_draw >HEIGHT)
-		eos=0;
+		eos=1;
             double distance_sq = pow(x_draw - object.x, 2) + pow(y_draw - object.y, 2);
-            if (distance_sq < r_sq){
+            if (distance_sq <= r_sq){
 		break;
 	    }
 	}
@@ -95,7 +96,7 @@ int main()
     struct Ray rays[NUM];
     SDL_Rect erase={0,0,WIDTH,HEIGHT};
     gen_ray(circle ,rays);
-
+    int speed=10;
     SDL_Event e;
     int quit = 0;
     while (!quit) {
@@ -111,9 +112,15 @@ int main()
 	    }
         }
 	SDL_FillRect(surface,&erase ,BLACK);
-	FillCircle(surface, circle, COLOR);
+	FillCircle(surface, circle, RAY);
 	FillCircle(surface, shadow, COLOR);
-	FillRays(surface, rays, COLOR,shadow);
+	FillRays(surface, rays, RAY,shadow);
+	shadow.y+=speed;
+	if(shadow.y-shadow.r<0)
+	   speed=-speed;
+        if(shadow.y+shadow.r>HEIGHT)
+           speed=-speed;
+
 	SDL_UpdateWindowSurface(window);
         SDL_Delay(10); 
     }
@@ -122,3 +129,4 @@ int main()
     SDL_Quit();
     return 0;
 }
+`
